@@ -1,0 +1,41 @@
+/* Design tokens. Canvas/WebGL code uses the same values from src/lib/palette.ts. */
+:root {
+  color-scheme: dark;
+  --bg: #06080b;
+  --bg-2: #090c10;
+  --panel: #0d1117;
+  --panel-2: #121821;
+  --panel-3: #18202b;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-2: rgba(255, 255, 255, 0.14);
+  --grid: #19212a;
+  --text: #e8eef4;
+  --text-2: #a9b5c1;
+  --muted: #6f7c8a;
+  --accent: #41c7ff;
+  --accent-2: #2d7fff;
+  --accent-wash: rgba(65, 199, 255, 0.1);
+  --baseline: #8d98a6;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
+  --good: #0ca30c;
+  --warning: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+  --prov-simulated: #41c7ff;
+  --prov-derived: #9085e9;
+  --prov-data: #19c48a;
+  --prov-assumed: #c3a25a;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk Variable', 'Inter Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
