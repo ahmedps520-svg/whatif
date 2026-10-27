@@ -17,6 +17,8 @@ npm run build      # typecheck + production build into dist/
 
 The build is a static site (hash routing, relative paths), so it can be hosted from any path. It needs no server and no API keys.
 
+**Live site:** https://ahmedps520-svg.github.io/whatif/ — the `Deploy to GitHub Pages` workflow (`.github/workflows/deploy-pages.yml`) rebuilds, tests and publishes `dist/` to the `gh-pages` branch on every push to the default branch. In the repository's *Settings → Pages*, the source must be *Deploy from a branch → gh-pages / (root)*.
+
 ## What is implemented
 
 | Model | Experiments | Method |
