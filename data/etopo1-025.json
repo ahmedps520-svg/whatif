@@ -1,0 +1,19 @@
+{
+  "file": "etopo1-025.i16.gz",
+  "format": "gzip-compressed little-endian Int16, metres relative to mean sea level, row-major",
+  "ncols": 1440,
+  "nrows": 721,
+  "lat0": 90,
+  "dlat": -0.25,
+  "lon0": -180,
+  "dlon": 0.25,
+  "min": -10750,
+  "max": 6407,
+  "sampling": "Point sample of every 15th 1-arc-minute node (0.25 degree spacing); values are not area averages.",
+  "dataset": "ETOPO1 Global Relief Model, Ice Surface, grid-registered (NOAA NGDC/NCEI)",
+  "citation": "Amante, C. and B. W. Eakins, 2009. ETOPO1 1 Arc-Minute Global Relief Model: Procedures, Data Sources and Analysis. NOAA Technical Memorandum NESDIS NGDC-24.",
+  "distributor": "NOAA CoastWatch ERDDAP, dataset etopo180",
+  "sourceUrl": "https://coastwatch.pfeg.noaa.gov/erddap/griddap/etopo180.esriAscii?altitude%5B(-90):15:(90)%5D%5B(-180):15:(180)%5D",
+  "license": "NOAA data; may be used and redistributed for free. Not intended for legal use and provided without warranty (see dataset licence text).",
+  "retrieved": "2026-10-26"
+}
