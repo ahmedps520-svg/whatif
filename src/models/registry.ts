@@ -9,6 +9,7 @@ import { seaLevelModel } from './sea-level/model';
 import { atmosphereModel } from './atmosphere/model';
 import { populationModel } from './population/model';
 import { blackoutModel } from './blackout/model';
+import { photosynthesisModel } from './photosynthesis/model';
 
 /**
  * Every implemented simulation model. Logic only — no views — so this module
@@ -25,6 +26,7 @@ export const MODELS: SimulationModel[] = [
   atmosphereModel,
   populationModel,
   blackoutModel,
+  photosynthesisModel,
 ];
 
 const byId = new Map(MODELS.map((m) => [m.id, m]));

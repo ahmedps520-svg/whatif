@@ -15,6 +15,7 @@ const VIEWS: Record<string, ViewComponent> = {
   moons: lazy(() => import('../models/moons/View')),
   asteroid: lazy(() => import('../models/asteroid/View')),
   'sea-level': lazy(() => import('../models/sea-level/View')),
+  photosynthesis: lazy(() => import('../models/photosynthesis/View')),
 };
 
 export function getView(modelId: string): ViewComponent | undefined {

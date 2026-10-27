@@ -96,6 +96,7 @@ const U = {
   'lbf': { symbol: 'lbf', name: 'pound-force', quantity: 'force', factor: 4.4482216 },
   'J': { symbol: 'J', name: 'joule', quantity: 'energy', factor: 1 },
   'kJ': { symbol: 'kJ', name: 'kilojoule', quantity: 'energy', factor: 1000 },
+  'kcal': { symbol: 'kcal', name: 'kilocalorie (food Calorie)', quantity: 'energy', factor: 4184 },
   'MtTNT': { symbol: 'Mt TNT', name: 'megatonne of TNT', quantity: 'energy', factor: 4.184e15 },
   'W': { symbol: 'W', name: 'watt', quantity: 'power', factor: 1 },
   'kg*m/s': { symbol: 'kg·m/s', name: 'kilogram metre per second', quantity: 'momentum', factor: 1 },

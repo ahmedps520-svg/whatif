@@ -12,6 +12,7 @@ import { experiments as seaLevel } from '../models/sea-level/experiments';
 import { experiments as atmosphere } from '../models/atmosphere/experiments';
 import { experiments as population } from '../models/population/experiments';
 import { experiments as blackout } from '../models/blackout/experiments';
+import { experiments as photosynthesis } from '../models/photosynthesis/experiments';
 
 /** Implemented experiments, in library order. Only experiments whose model is registered are listed. */
 export const EXPERIMENTS: ExperimentDef[] = [
@@ -23,6 +24,7 @@ export const EXPERIMENTS: ExperimentDef[] = [
   ...planet,
   ...seaLevel,
   ...atmosphere,
+  ...photosynthesis,
   ...population,
   ...blackout,
 ].filter((e) => !!getModel(e.modelId));
