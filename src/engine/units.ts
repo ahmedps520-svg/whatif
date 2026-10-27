@@ -206,6 +206,8 @@ export function formatNumber(v: number, sig = 3): string {
   if (!Number.isFinite(v)) return Number.isNaN(v) ? '—' : v > 0 ? '∞' : '−∞';
   if (v === 0) return '0';
   const a = Math.abs(v);
+  // Whole numbers (counts) are shown as they are — no trailing ".0".
+  if (Number.isInteger(v) && a < 1e4) return String(v).replace('-', '−');
   if (a >= 1e15 || a < 1e-4) {
     const [m, e] = v.toExponential(Math.max(0, sig - 1)).split('e');
     return `${m}×10${superscript(Number(e))}`;

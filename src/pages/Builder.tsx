@@ -137,13 +137,20 @@ export default function Builder() {
         {step === 2 && (
           <>
             <h2>3 · Choose a compatible model</h2>
-            {matches.ranked.length === 0 ? (
+            {matches.inDomain.length === 0 && (
               <div className="notice notice-warning">
-                <strong>This scenario needs a new model.</strong> None of the implemented models can represent “{question}” in the {DOMAINS.find((d) => d.id === domain)?.label} domain. WHAT IF LAB will not invent a simulation for it.
+                <span>
+                  <strong>This scenario needs a new model.</strong> No implemented model covers the {DOMAINS.find((d) => d.id === domain)?.label} domain yet, so WHAT IF LAB cannot simulate “{question}” and will not invent a result.
+                  {matches.ranked.length > 0 && ' The models below share keywords with your question but belong to other domains — use one only if its variables genuinely represent the change you mean.'}
+                </span>
               </div>
-            ) : (
-              <p className="small muted">Ranked by how well each model matches your question and domain. Check that its variables can actually express the change you have in mind.</p>
             )}
+            {matches.inDomain.length > 0 && matches.ranked.length === 0 && (
+              <div className="notice notice-warning">
+                <strong>This scenario needs a new model.</strong> None of the implemented models can represent “{question}”. WHAT IF LAB will not invent a simulation for it.
+              </div>
+            )}
+            {matches.ranked.length > 0 && matches.inDomain.length > 0 && <p className="small muted">Ranked by how well each model matches your question and domain. Check that its variables can actually express the change you have in mind.</p>}
             <div className="model-list">
               {matches.ranked.map(({ m }) => (
                 <article key={m.id} className={`model-card ${modelId === m.id ? 'on' : ''}`}>
@@ -160,7 +167,6 @@ export default function Builder() {
                 </article>
               ))}
             </div>
-            {matches.ranked.length > 0 && matches.inDomain.length === 0 && <p className="small muted">No model belongs to this domain yet; the matches above come from other domains.</p>}
             {plannedHints.length > 0 && (
               <div className="panel inset">
                 <h3 className="subhead">Related planned scenarios (science overview only)</h3>

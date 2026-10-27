@@ -30,7 +30,7 @@ export const experiments: ExperimentDef[] = [
     difficulty: 'intermediate',
     estMinutes: 6,
     params: { o2Amount: 143, mode: 'replace', transitionYears: 0, duration: 5 },
-    baseline: { o2Amount: 100 },
+    baseline: { o2Amount: 100, mode: 'replace', transitionYears: 0, duration: 5 },
     baselineLabel: 'Today’s atmosphere',
     assumptions: [
       'Interpreted as oxygen displacing nitrogen at today’s total pressure (143 % of today’s oxygen gives about 30 % O₂).',

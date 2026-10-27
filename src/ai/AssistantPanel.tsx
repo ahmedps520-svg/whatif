@@ -3,7 +3,7 @@ import type Anthropic from '@anthropic-ai/sdk';
 import { Link } from 'react-router-dom';
 import { Icon } from '../components/Icon';
 import { buildContextBlock, systemPrompt, type AssistantContext } from './context';
-import { streamReply, type ChatMessage } from './claude';
+import type { ChatMessage } from './claude';
 import { getApiKey, setApiKey, setPrefs, usePrefs } from '../store/prefs';
 import { noteCounter } from '../store/activity';
 import { formatNumber, formatQuantity } from '../engine/units';
@@ -203,6 +203,8 @@ export function AssistantPanel({ getContext, onClose }: { getContext: () => Assi
     setTurns((t) => [...t, { role: 'user', text: q }, { role: 'assistant', text: '' }]);
     abort.current = new AbortController();
     try {
+      // The SDK is loaded on first use so experiments open without it.
+      const { streamReply } = await import('./claude');
       const final = await streamReply({
         apiKey: getApiKey(),
         model: prefs.aiModel,

@@ -233,7 +233,10 @@ function Lab({ config }: { config: LabConfig }) {
       return;
     }
     setBaselineState('running');
-    const job: Job<RunRecord> = runInBackground(model.id, baselineParams, { duration, maxSamples: 3000 });
+    // Record the baseline with the same run length as the experiment.
+    const dp = model.time.durationParam;
+    const bp = dp ? { ...baselineParams, [dp]: duration } : baselineParams;
+    const job: Job<RunRecord> = runInBackground(model.id, bp, { duration, maxSamples: 3000 });
     job.promise
       .then((r) => {
         setBaseline(r);
