@@ -29,6 +29,7 @@ The build is a static site (hash routing, relative paths), so it can be hosted f
 | Planet Lab (3D globe) | Sandbox; faster rotation; axial tilt; brighter Sun; stronger gravity; Mars; more ocean | Derived planetary quantities, energy balance, insolation by latitude and season |
 | Sea-Level Rise Mapper | +100 m; all polar ice; Greenland | NOAA ETOPO1 0.25° grid; Priority-Flood hydrological connectivity in a web worker |
 | Atmospheric Oxygen Model | Half the oxygen; 30 % oxygen | Dalton's law, alveolar gas equation, ICAO standard atmosphere |
+| Photosynthetic Human Energy Budget | Humans photosynthesize; best possible case | Solar geometry, Meinel clear-sky irradiance, posture shape factors, literature photosynthetic efficiencies |
 | Population & Resource Simulator | Sandbox; population doubled; fusion power | Stock-and-flow model with explicit feedbacks (RK4) |
 | Wide-Area Blackout Scenario | Electricity disappears; well-prepared backup | Branching system-dynamics model with an uncertainty envelope across branches |
 
