@@ -23,6 +23,8 @@ interface Pending {
   resolve: (v: any) => void;
   reject: (e: Error) => void;
   worker: Worker;
+  /** Main-thread fallback if the worker cannot run at all (e.g. a host's security policy blocks it). */
+  fallback: () => Promise<unknown>;
 }
 
 let nextId = 1;
@@ -32,14 +34,20 @@ const MAX_WORKERS = Math.max(1, Math.min(3, (globalThis.navigator?.hardwareConcu
 let liveWorkers = 0;
 const queue: (() => void)[] = [];
 
+/** Set when workers turn out to be unusable here; later jobs then run on the main thread. */
+let workersBroken = false;
+/** Whether any worker has ever answered — distinguishes "cannot load" from a job failing. */
+let workerEverAnswered = false;
+
 function workersSupported(): boolean {
-  return typeof Worker !== 'undefined';
+  return typeof Worker !== 'undefined' && !workersBroken;
 }
 
 function createWorker(): Worker {
   const w = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
   liveWorkers++;
   w.onmessage = (ev: MessageEvent<WorkerResponse>) => {
+    workerEverAnswered = true;
     const m = ev.data;
     const p = pending.get(m.id);
     if (!p) return;
@@ -49,10 +57,15 @@ function createWorker(): Worker {
     else p.reject(new Error(m.message));
   };
   w.onerror = (ev) => {
+    ev.preventDefault?.();
+    // A worker that never answered most likely could not load (blocked by the host): fall back.
+    const fallBack = !workerEverAnswered;
+    if (fallBack) workersBroken = true;
     for (const [id, p] of pending) {
       if (p.worker === w) {
         pending.delete(id);
-        p.reject(new Error(ev.message || 'Worker failed'));
+        if (fallBack) p.fallback().then(p.resolve, p.reject);
+        else p.reject(new Error(ev.message || 'Worker failed'));
       }
     }
     w.terminate();
@@ -84,22 +97,39 @@ function drain() {
   if (next) next();
 }
 
-function submit<T>(build: (id: number) => WorkerRequest): Job<T> {
+function submit<T>(build: (id: number) => WorkerRequest, fallback: () => Promise<T>): Job<T> {
   const id = nextId++;
   let cancelled = false;
   let worker: Worker | null = null;
   let rejectFn: (e: Error) => void = () => {};
   const promise = new Promise<T>((resolve, reject) => {
     rejectFn = reject;
-    acquire().then((w) => {
-      if (cancelled) {
-        release(w);
-        return;
-      }
-      worker = w;
-      pending.set(id, { resolve, reject, worker: w });
-      w.postMessage(build(id));
-    });
+    if (!workersSupported()) {
+      fallback().then(resolve, reject);
+      return;
+    }
+    let acquired: Promise<Worker>;
+    try {
+      acquired = acquire();
+    } catch {
+      workersBroken = true;
+      fallback().then(resolve, reject);
+      return;
+    }
+    acquired
+      .then((w) => {
+        if (cancelled) {
+          release(w);
+          return;
+        }
+        worker = w;
+        pending.set(id, { resolve, reject, worker: w, fallback });
+        w.postMessage(build(id));
+      })
+      .catch(() => {
+        workersBroken = true;
+        fallback().then(resolve, reject);
+      });
   });
   return {
     promise,
@@ -118,23 +148,24 @@ function submit<T>(build: (id: number) => WorkerRequest): Job<T> {
   };
 }
 
-/** Run a model headless in a background worker (falls back to the main thread). */
-export function runInBackground(modelId: string, params: Partial<ParamValues>, opts?: HeadlessOptions): Job<RunRecord> {
-  if (!workersSupported()) {
-    const model = getModel(modelId);
-    if (!model) return { promise: Promise.reject(new Error(`Unknown model ${modelId}`)), cancel: () => {} };
-    return { promise: Promise.resolve(model.prepare?.()).then(() => runHeadless(model, params, opts)), cancel: () => {} };
-  }
-  return submit<RunRecord>((id) => ({ type: 'run', id, modelId, params, opts, dataBase: getDataBase() }));
+function runHere(modelId: string, params: Partial<ParamValues>, opts?: HeadlessOptions): Promise<RunRecord> {
+  const model = getModel(modelId);
+  if (!model) return Promise.reject(new Error(`Unknown model ${modelId}`));
+  // Yield first so the UI can paint before a main-thread computation.
+  return new Promise((r) => setTimeout(r, 0))
+    .then(() => model.prepare?.())
+    .then(() => runHeadless(model, params, opts));
 }
 
-/** Run a registered compute task in a background worker. */
+/** Run a model headless in a background worker (falls back to the main thread). */
+export function runInBackground(modelId: string, params: Partial<ParamValues>, opts?: HeadlessOptions): Job<RunRecord> {
+  return submit<RunRecord>((id) => ({ type: 'run', id, modelId, params, opts, dataBase: getDataBase() }), () => runHere(modelId, params, opts));
+}
+
+/** Run a registered compute task in a background worker (falls back to the main thread). */
 export function computeInBackground<T>(task: string, payload: unknown): Job<T> {
-  if (!workersSupported()) {
-    return {
-      promise: import('./computeTasks').then(() => computeTasks[task](payload) as T),
-      cancel: () => {},
-    };
-  }
-  return submit<T>((id) => ({ type: 'compute', id, task, payload, dataBase: getDataBase() }));
+  return submit<T>(
+    (id) => ({ type: 'compute', id, task, payload, dataBase: getDataBase() }),
+    () => import('./computeTasks').then(() => computeTasks[task](payload) as T),
+  );
 }
