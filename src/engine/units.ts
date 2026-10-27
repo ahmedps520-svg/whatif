@@ -49,6 +49,8 @@ const U = {
   '%/day': { symbol: '%/day', name: 'percent per day', quantity: 'rate', factor: 0.01 / 86400 },
   '1/yr': { symbol: '/yr', name: 'per year', quantity: 'rate', factor: 1 },
   'people/yr': { symbol: 'people/yr', name: 'people per year', quantity: 'rate', factor: 1 },
+  'million': { symbol: 'million', name: 'million people', quantity: 'count', factor: 1e6 },
+  'million/yr': { symbol: 'million/yr', name: 'million people per year', quantity: 'rate', factor: 1e6 },
   // length
   'm': { symbol: 'm', name: 'metre', quantity: 'length', factor: 1 },
   'cm': { symbol: 'cm', name: 'centimetre', quantity: 'length', factor: 0.01 },
@@ -74,6 +76,7 @@ const U = {
   'M_earth': { symbol: 'M⊕', name: 'Earth mass', quantity: 'mass', factor: 5.9722e24 },
   'M_moon': { symbol: 'M☾', name: 'Moon mass', quantity: 'mass', factor: 7.342e22 },
   'M_sun': { symbol: 'M☉', name: 'solar mass', quantity: 'mass', factor: 1.98847e30 },
+  'M_jup': { symbol: 'M♃', name: 'Jupiter mass', quantity: 'mass', factor: 1.89813e27 },
   // velocity
   'm/s': { symbol: 'm/s', name: 'metre per second', quantity: 'velocity', factor: 1 },
   'km/s': { symbol: 'km/s', name: 'kilometre per second', quantity: 'velocity', factor: 1000 },
@@ -82,6 +85,7 @@ const U = {
   'ft/s': { symbol: 'ft/s', name: 'foot per second', quantity: 'velocity', factor: 0.3048 },
   'm/yr': { symbol: 'm/yr', name: 'metre per year', quantity: 'velocity', factor: 1 / (365.25 * 86400) },
   'mm/yr': { symbol: 'mm/yr', name: 'millimetre per year', quantity: 'velocity', factor: 0.001 / (365.25 * 86400) },
+  'm/century': { symbol: 'm/century', name: 'metre per century', quantity: 'velocity', factor: 1 / (100 * 365.25 * 86400) },
   // acceleration
   'm/s2': { symbol: 'm/s²', name: 'metre per second squared', quantity: 'acceleration', factor: 1 },
   'gee': { symbol: 'g₀', name: 'standard gravity', quantity: 'acceleration', factor: 9.80665 },
@@ -104,6 +108,8 @@ const U = {
   'psi': { symbol: 'psi', name: 'pound per square inch', quantity: 'pressure', factor: 6894.757 },
   'kg/m3': { symbol: 'kg/m³', name: 'kilogram per cubic metre', quantity: 'density', factor: 1 },
   'g/cm3': { symbol: 'g/cm³', name: 'gram per cubic centimetre', quantity: 'density', factor: 1000 },
+  'kg/m2': { symbol: 'kg/m²', name: 'kilogram per square metre (column mass)', quantity: 'none', factor: 1 },
+  'g/mol': { symbol: 'g/mol', name: 'gram per mole (molar mass)', quantity: 'none', factor: 1 },
   // temperature (base: kelvin)
   'K': { symbol: 'K', name: 'kelvin', quantity: 'temperature', factor: 1 },
   'C': {
@@ -135,6 +141,8 @@ const U = {
   'L_sun': { symbol: 'L☉', name: 'solar luminosity', quantity: 'luminosity', factor: 3.828e26 },
   // abstract model units
   'index': { symbol: '', name: 'index', quantity: 'none', factor: 1 },
+  'RU': { symbol: 'RU', name: 'resource unit (abstract model quantity)', quantity: 'none', factor: 1 },
+  'RU/yr': { symbol: 'RU/yr', name: 'resource units per year (abstract model quantity)', quantity: 'none', factor: 1 },
 } satisfies Record<string, UnitInfo>;
 
 export type UnitId = keyof typeof U;

@@ -33,7 +33,9 @@ export class LiveRunner<S = any> {
 
   subscribe(fn: () => void): () => void {
     this.listeners.add(fn);
-    return () => this.listeners.delete(fn);
+    return () => {
+      this.listeners.delete(fn);
+    };
   }
 
   private emit() {

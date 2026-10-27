@@ -213,12 +213,13 @@ function stepBody(s: ProjectileState, p: ParamValues, b: Body, g: number, h: num
   const e1 = kinetic(b) + b.m * g * b.y;
   if (rho > 0) s.dissipated += Math.max(0, e0 - e1);
 
-  // Apex: vertical velocity changes sign from + to −.
+  // Apex: vertical velocity changes sign from + to −. Only the first flight
+  // and the first two clearly visible bounces are reported, to avoid noise.
   if (vy0 > 0 && b.vy <= 0 && !b.apexReported) {
     const frac = vy0 / (vy0 - b.vy);
     const ta = t0 + frac * h;
     b.apexReported = true;
-    s.pending.push({
+    if (b.landings === 0 || (b.landings <= 2 && b.y - b.r >= 0.1)) s.pending.push({
       t: ta,
       id: `${b.id}-apex-${b.landings}`,
       label: `Object ${b.label} reached its highest point`,

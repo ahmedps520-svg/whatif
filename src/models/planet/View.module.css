@@ -1,0 +1,199 @@
+.root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  container-type: size;
+  overflow: hidden;
+  background: var(--bg, #06080b);
+  color: var(--text, #e8eef4);
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.panel {
+  position: absolute;
+  z-index: 4;
+  background: rgba(6, 8, 11, 0.74);
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--text-2, #a9b5c1);
+}
+
+.inset {
+  top: 8px;
+  left: 8px;
+  width: 150px;
+  padding: 6px 8px 7px;
+}
+
+.insetCanvas {
+  width: 134px;
+  height: 118px;
+}
+
+.insetTitle {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted, #6f7c8a);
+}
+
+.season {
+  color: var(--text, #e8eef4);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.observer {
+  left: 8px;
+  bottom: 40px;
+  max-width: min(300px, calc(100% - 16px));
+  padding: 6px 9px;
+}
+
+.observer strong {
+  color: var(--text, #e8eef4);
+  font-weight: 600;
+}
+
+.mono {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  color: var(--muted, #6f7c8a);
+  margin-top: 2px;
+}
+
+.legendWrap {
+  right: 8px;
+  bottom: 8px;
+  max-width: min(260px, calc(100% - 16px));
+  max-height: calc(100% - 64px);
+  overflow: auto;
+  padding: 6px 9px 8px;
+}
+
+.legendToggle {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-2, #a9b5c1);
+}
+
+.legendToggle:focus-visible,
+.seg button:focus-visible {
+  outline: 2px solid var(--accent, #41c7ff);
+  outline-offset: 2px;
+}
+
+.legendList {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.legendList li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.swatch {
+  flex: none;
+  width: 12px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.lineSwatch {
+  flex: none;
+  width: 14px;
+  height: 0;
+  border-top: 2px solid currentColor;
+}
+
+.dashed {
+  border-top-style: dashed;
+}
+
+.dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.note {
+  margin: 6px 0 0;
+  color: var(--muted, #6f7c8a);
+  font-size: 0.7rem;
+}
+
+.seg {
+  display: flex;
+  gap: 2px;
+  margin-top: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.seg button {
+  all: unset;
+  cursor: pointer;
+  flex: 1;
+  text-align: center;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: var(--text-2, #a9b5c1);
+}
+
+.seg button[aria-pressed='true'] {
+  background: var(--accent-wash, rgba(65, 199, 255, 0.1));
+  color: var(--accent, #41c7ff);
+}
+
+.status {
+  margin-top: 4px;
+  font-size: 0.7rem;
+  color: var(--warning, #fab219);
+}
+
+@container (max-width: 560px) {
+  .inset {
+    width: 118px;
+    padding: 4px 6px;
+  }
+  .insetCanvas {
+    width: 104px;
+    height: 92px;
+  }
+  .observer {
+    max-width: calc(100% - 16px);
+    bottom: 36px;
+  }
+  .hint {
+    display: none;
+  }
+}
+
+@container (max-height: 340px) {
+  .observer {
+    display: none;
+  }
+}

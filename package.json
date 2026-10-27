@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc --noEmit -p . && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -b --noEmit",
+    "typecheck": "tsc --noEmit -p .",
     "test": "vitest run",
     "test:watch": "vitest",
     "data:etopo": "node scripts/build-elevation.mjs"

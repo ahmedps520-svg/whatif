@@ -39,6 +39,10 @@ export default function ProjectileView({ runner, baseline, overlays, cameraReset
       b.maxX += w * 0.04;
       b.minY = -Math.max(0.5, (b.maxY - b.minY) * 0.06);
       c.fit(b, 0.08, c.scale === 10 ? 0 : 0.15);
+      // Keep the ground near the bottom edge instead of centring vertically.
+      const bottomWorld = c.cy - size.height / 2 / c.scale;
+      const desired = b.minY - (size.height * 0.06) / c.scale;
+      if (bottomWorld < desired) c.cy += desired - bottomWorld;
     }
 
     ctx.fillStyle = COLORS.bg;
