@@ -137,8 +137,13 @@ describe('priority-flood flood levels', () => {
     for (const i of lakeCells) expect(p.floodLevel[i]).toBe(10);
     expect(p.totals.inlandWater).toBeGreaterThan(0);
     // Lake cells are neither land nor counted as inundated under either rule.
-    const basinLand = 7 * 3 - 9;
-    expect(p.totals.landBelowSeaLevel / stripArea([7])).toBeCloseTo(basinLand / 7, 6);
+    let basinLand = 0;
+    for (let i = 0; i < p.cls.length; i++) {
+      const c = i % 12;
+      if (c >= 7 && c <= 9 && p.cls[i] === CLS_LAND) basinLand += cellArea(stripMeta, 7, Math.floor(i / 12));
+    }
+    expect(p.totals.landBelowSeaLevel).toBeCloseTo(basinLand, 6);
+    expect(p.totals.landBelowSeaLevel).toBeLessThan(stripArea([7, 8, 9]));
     const anyAll = inundatedArea(p, 200, 'any');
     expect(anyAll).toBeCloseTo(p.totals.land, 6);
   });

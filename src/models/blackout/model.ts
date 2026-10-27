@@ -470,7 +470,7 @@ export const blackoutModel: SimulationModel<BlackoutState> = {
     { key: 'waterStorage', label: 'Typical elevated water storage lasts', type: 'number', unit: 'h', kind: 'initial', group: ADV, min: 1, max: 96, step: 1, default: 12, description: `Spread ±50 % across systems. ${branchNote('Backup preparedness', prepValues('waterStorage', ' h'))}`, visibleWhen: isCustom('preparedness') },
     { key: 'fuelOnHand', label: 'Generator fuel on hand', type: 'number', unit: 'h', kind: 'initial', group: ADV, min: 0, max: 336, step: 1, default: 48, description: `Hours of full-load running stored at backed-up facilities. ${branchNote('Backup preparedness', prepValues('fuelOnHand', ' h'))}`, visibleWhen: isCustom('preparedness') },
     { key: 'pumpBackup', label: 'Fuel stations with backup power', type: 'number', unit: '%', kind: 'initial', group: ADV, min: 0, max: 100, step: 1, default: 10, description: branchNote('Backup preparedness', prepValues('pumpBackup', ' %')), visibleWhen: isCustom('preparedness') },
-    { key: 'generatorFailure', label: 'Generator failure rate while running', type: 'number', unit: '%/day', kind: 'initial', group: ADV, min: 0, max: 20, step: 0.1, default: 2, description: branchNote('Backup preparedness', prepValues('generatorFailure', ' %/day')), visibleWhen: isCustom('preparedness') },
+    { key: 'generatorFailure', label: 'Generator failure rate while needed', type: 'number', unit: '%/day', kind: 'initial', group: ADV, min: 0, max: 20, step: 0.1, default: 2, description: branchNote('Backup preparedness', prepValues('generatorFailure', ' %/day')), visibleWhen: isCustom('preparedness') },
     // Advanced: logistics
     { key: 'resupplyCapacity', label: 'Fuel resupply capacity', type: 'number', unit: '%', kind: 'initial', group: ADV, min: 0, max: 200, step: 1, default: 100, description: `Deliveries per hour as a share of full-load generator demand, when depots have power and communications work. ${branchNote('Fuel logistics', logValues('resupplyCapacity'))} 0 means no resupply at all.`, visibleWhen: isCustom('logistics') },
     { key: 'terminalBackup', label: 'Fuel depots with backup power', type: 'number', unit: '%', kind: 'initial', group: ADV, min: 0, max: 100, step: 1, default: 90, description: branchNote('Fuel logistics', logValues('terminalBackup')), visibleWhen: isCustom('logistics') },
@@ -560,8 +560,8 @@ export const blackoutModel: SimulationModel<BlackoutState> = {
       });
     }
     s.F = Math.min(s.Fcap, Math.max(0, F1raw));
-    // Generator failures while running (exact exponential decay for constant rates over the step).
-    s.W *= Math.exp(-a.failurePerH * burn * dt);
+    // Generator failures while units are needed (exact exponential decay for constant rates over the step).
+    s.W *= Math.exp(-a.failurePerH * L.need * dt);
     // Vehicle fuel: tanks drain at reduced driving; refuelling where pumps have power.
     const use = V0 / (24 * a.vehicleTankDays);
     const dV = -(s.V > 0 ? use : 0) + L.pumps * (use + REFUEL_RATE * Math.max(0, V0 - s.V));
@@ -720,6 +720,7 @@ export const blackoutModel: SimulationModel<BlackoutState> = {
     'Human behaviour (panic buying, hoarding, evacuation, mutual aid, crime), organised emergency response and international assistance are not modelled, or only crudely through the branches.',
     'Cascading failures across borders, cyberattacks, damage to the grid itself and the reasons for the outage are not represented.',
     'Health outcomes (illness, deaths, heat or cold exposure, medical-device dependence) are not modelled; healthcare is only a capacity level.',
+    'Failed generators are not repaired during the run, and failures accrue per hour a unit is needed whether or not it has fuel (so better logistics never increases wear).',
     'Heating and cooling, sanitation and sewage, banking and payments, industry and agriculture are not represented.',
     'Uncertainty: how long backup fuel lasts dominates the first days; how fast the grid returns dominates everything after that. The envelope across branches shows how much the outcome depends on these choices — it is a range across modelled branches, not a probability.',
   ],
@@ -727,7 +728,7 @@ export const blackoutModel: SimulationModel<BlackoutState> = {
     { label: 'Grid', formula: 'G(t) = 0 for t < t_d;  x = min(1, (t − t_d)/T_r);  G = x (linear) or [σ(10(x − ½)) − σ(−5)] / [σ(5) − σ(−5)] (S-curve)', explanation: 'Restoration starts after delay t_d and completes over T_r, both set by the restoration branch.' },
     { label: 'Buffer share', formula: 'b(t; N) = clamp((1.5N − t) / N, 0, 1)', explanation: 'Share of sites whose buffer (battery runtime, stored water) of typical size N hours still lasts; buffers spread uniformly from 0.5N to 1.5N.' },
     { label: 'Fuel deliveries', formula: 'R = ρ · [G + (1 − G)·s_depot] · (0.5 + 0.5·C(t − Δt))', explanation: 'Delivery capacity ρ (share of full generator demand per hour), scaled by depots with power and halved without communications.' },
-    { label: 'Generator fuel and output', formula: 'dF/dt = R − (1 − G)·u,  u = 1 if F > 0 else min(1, R/(1 − G)),  F ≤ F_cap,  dW/dt = −λ·(1 − G)·u·W,  B = W·u', explanation: 'Fuel on hand F (hours of full-load running) falls while generators run and refills with deliveries; generators fail at rate λ while running; B is the share of backup generation available.' },
+    { label: 'Generator fuel and output', formula: 'dF/dt = R − (1 − G)·u,  u = 1 if F > 0 else min(1, R/(1 − G)),  F ≤ F_cap,  dW/dt = −λ·(1 − G)·W,  B = W·u', explanation: 'Fuel on hand F (hours of full-load running) falls while generators run and refills with deliveries; units fail at rate λ for every hour they are needed (failed units are not repaired during the run); B is the share of backup generation available.' },
     { label: 'Communications', formula: 'C = G + (1 − G)·[s_cell·max(B, b(t; N_bat)) + (1 − s_cell)·b(t; N_bat)]', explanation: 'Unpowered cell sites run on batteries, then only those with generators (share s_cell) stay on air.' },
     { label: 'Water', formula: 'Wt = G + (1 − G)·[s_w·max(B, b(t; N_store)) + (1 − s_w)·b(t; N_store)]', explanation: 'Elevated storage keeps pressure for a while; afterwards only systems with backup pumping (share s_w) deliver.' },
     { label: 'Fuel & transport', formula: 'Pu = G + (1 − G)·s_pump·W,  dV/dt = −v·[V > 0] + Pu·(v + k·max(0, V₀ − V)),  T = min(1, V/V₀)', explanation: 'Vehicle tanks (average V₀ = ½) drain at v = V₀/(24·days per tank); where pumps have power, vehicles refuel toward normal (k = 1/12 h⁻¹).' },

@@ -3,9 +3,29 @@ import { PLANNED } from './planned';
 import { CATEGORIES } from './categories';
 import { getModel } from '../models/registry';
 import { experiments as projectile } from '../models/projectile/experiments';
+import { experiments as gravityCompare } from '../models/gravity-compare/experiments';
+import { experiments as orbitExplorer } from '../models/orbit-explorer/experiments';
+import { experiments as moons } from '../models/moons/experiments';
+import { experiments as asteroid } from '../models/asteroid/experiments';
+import { experiments as planet } from '../models/planet/experiments';
+import { experiments as seaLevel } from '../models/sea-level/experiments';
+import { experiments as atmosphere } from '../models/atmosphere/experiments';
+import { experiments as population } from '../models/population/experiments';
+import { experiments as blackout } from '../models/blackout/experiments';
 
 /** Implemented experiments, in library order. Only experiments whose model is registered are listed. */
-export const EXPERIMENTS: ExperimentDef[] = [...projectile].filter((e) => !!getModel(e.modelId));
+export const EXPERIMENTS: ExperimentDef[] = [
+  ...gravityCompare,
+  ...projectile,
+  ...orbitExplorer,
+  ...moons,
+  ...asteroid,
+  ...planet,
+  ...seaLevel,
+  ...atmosphere,
+  ...population,
+  ...blackout,
+].filter((e) => !!getModel(e.modelId));
 
 export { PLANNED };
 

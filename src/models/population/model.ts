@@ -516,7 +516,7 @@ export const populationModel: SimulationModel<PopulationState> = {
   name: 'Population & Resource Simulator',
   shortName: 'Population',
   domain: 'population',
-  viewKind: 'chart',
+  viewKind: '2d',
   summary:
     'A transparent stock-and-flow scenario model: population draws on a regenerating resource, an energy supply and infrastructure, and explicit feedbacks change birth and death rates when needs go unmet. It explores mechanisms, not predictions.',
   params: [

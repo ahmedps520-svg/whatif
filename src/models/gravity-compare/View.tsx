@@ -147,8 +147,9 @@ function sharedScales(s: GravityState, pr: Predictions, p: ParamValues, tracks: 
 }
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
-  const rr = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
+  if (!(w > 0 && h > 0)) return; // degenerate during the first layout pass
+  const rr = Math.max(0, Math.min(r, w / 2, h / 2));
   ctx.moveTo(x + rr, y);
   ctx.arcTo(x + w, y, x + w, y + h, rr);
   ctx.arcTo(x + w, y + h, x, y + h, rr);
