@@ -30,6 +30,8 @@ import { play as cue } from '../audio/sound';
 import { AssistantPanel, type AssistantContext } from '../ai/AssistantPanel';
 import { runToMarkdown, download, slug } from '../lib/export';
 import { formatTime } from '../engine/units';
+import { Modal } from '../components/Modal';
+import { IS_ARTIFACT } from '../lib/target';
 
 interface LabConfig {
   model: SimulationModel;
@@ -214,6 +216,7 @@ function Lab({ config }: { config: LabConfig }) {
   const [notice, setNotice] = useState<string | null>(config.issues.length ? config.issues.join(' ') : null);
   const [challengeResult, setChallengeResult] = useState<ChallengeResult | null>(null);
   const [verifying, setVerifying] = useState(false);
+  const [shareLink, setShareLink] = useState<string | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const handledCore = useRef<unknown>(null);
   const lastEventCount = useRef(0);
@@ -364,7 +367,7 @@ function Lab({ config }: { config: LabConfig }) {
       await navigator.clipboard.writeText(url);
       toast('Link to this configuration copied. Anyone opening it runs the same model with the same settings.', 'success');
     } catch {
-      window.prompt('Copy this link to share the configuration:', url);
+      setShareLink(url);
     }
   };
 
@@ -611,7 +614,7 @@ function Lab({ config }: { config: LabConfig }) {
             {tab === 'learn' && (
               <>
                 <LearnTab model={model} experimentId={experiment?.id ?? model.id} />
-                <button
+                {!IS_ARTIFACT && <button
                   className="btn secondary small"
                   onClick={() =>
                     download(
@@ -622,7 +625,7 @@ function Lab({ config }: { config: LabConfig }) {
                   }
                 >
                   <Icon name="download" /> Export lesson summary
-                </button>
+                </button>}
               </>
             )}
           </div>
@@ -657,6 +660,12 @@ function Lab({ config }: { config: LabConfig }) {
           onSave={doSave}
           onClose={() => setSaving(false)}
         />
+      )}
+      {shareLink && (
+        <Modal title="Share this configuration" onClose={() => setShareLink(null)}>
+          <p className="small">Copy this link. Anyone opening it runs the same model with the same settings.</p>
+          <input className="share-link" readOnly value={shareLink} onFocus={(e) => e.target.select()} autoFocus aria-label="Share link" />
+        </Modal>
       )}
       {assistantOpen && <AssistantPanel getContext={assistantContext} onClose={() => setAssistantOpen(false)} />}
     </div>

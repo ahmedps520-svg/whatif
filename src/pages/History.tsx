@@ -20,6 +20,9 @@ import { Icon } from '../components/Icon';
 import { toast } from '../components/Toasts';
 import { download, runToMarkdown, slug } from '../lib/export';
 import { usePrefs } from '../store/prefs';
+import { confirmAction } from '../components/Confirm';
+import { IS_ARTIFACT } from '../lib/target';
+import { FullSiteNote } from '../components/FullSiteNote';
 
 function exportOne(s: SavedExperiment) {
   download(`${slug(s.name)}.whatif.json`, JSON.stringify({ format: 'what-if-lab/experiment@1', ...s }, null, 1));
@@ -105,14 +108,16 @@ function Row({ s, selected, onSelect }: { s: SavedExperiment; selected: boolean;
           <button className="btn-icon" title="Notes, tags and collections" aria-expanded={open} onClick={() => setOpen(!open)}>
             <Icon name="book" size={16} />
           </button>
-          <button className="btn-icon" title="Export" onClick={() => exportOne(s)}>
-            <Icon name="download" size={16} />
-          </button>
+          {!IS_ARTIFACT && (
+            <button className="btn-icon" title="Export" onClick={() => exportOne(s)}>
+              <Icon name="download" size={16} />
+            </button>
+          )}
           <button
             className="btn-icon danger"
             title="Delete"
-            onClick={() => {
-              if (window.confirm(`Delete “${s.name}”? This cannot be undone.`)) {
+            onClick={async () => {
+              if (await confirmAction({ title: 'Delete experiment', message: `Delete “${s.name}”? This cannot be undone.`, confirmLabel: 'Delete', danger: true })) {
                 deleteExperiment(s.id);
                 toast('Deleted.', 'info');
               }
@@ -142,7 +147,7 @@ function Row({ s, selected, onSelect }: { s: SavedExperiment; selected: boolean;
               ))}
             </div>
           </div>
-          {model && (
+          {model && !IS_ARTIFACT && (
             <button className="btn secondary small" onClick={() => download(`${slug(s.name)}.md`, runToMarkdown({ model, question: s.question, run: s.result, notes: s.notes, includeEducation: prefs.educationMode, level: prefs.level }), 'text/markdown')}>
               <Icon name="download" /> Export summary (.md)
             </button>
@@ -178,6 +183,7 @@ export default function History() {
       <header className="page-head">
         <h1>Experiment history</h1>
         <p className="muted">Your saved experiments and collections, stored in this browser.</p>
+        {IS_ARTIFACT && <FullSiteNote text="Exports are available" />}
         <div className="toolbar">
           <button className="btn secondary" disabled={sel.length < 2} onClick={() => navigate(`/compare?runs=${sel.join(',')}`)}>
             <Icon name="compare" /> Compare selected ({sel.length})
@@ -185,9 +191,11 @@ export default function History() {
           <button className="btn secondary" onClick={() => fileRef.current?.click()}>
             <Icon name="upload" /> Import
           </button>
-          <button className="btn secondary" disabled={!experiments.length} onClick={() => download('what-if-lab-history.json', JSON.stringify({ format: 'what-if-lab/history@1', experiments, collections }, null, 1))}>
-            <Icon name="download" /> Export all
-          </button>
+          {!IS_ARTIFACT && (
+            <button className="btn secondary" disabled={!experiments.length} onClick={() => download('what-if-lab-history.json', JSON.stringify({ format: 'what-if-lab/history@1', experiments, collections }, null, 1))}>
+              <Icon name="download" /> Export all
+            </button>
+          )}
           <input
             ref={fileRef}
             type="file"
@@ -286,8 +294,8 @@ export default function History() {
               </div>
               <button
                 className="btn-text small danger"
-                onClick={() => {
-                  if (window.confirm(`Delete the collection “${current.name}”? Experiments in it are kept.`)) {
+                onClick={async () => {
+                  if (await confirmAction({ title: 'Delete collection', message: `Delete the collection “${current.name}”? Experiments in it are kept.`, confirmLabel: 'Delete', danger: true })) {
                     deleteCollection(current.id);
                     setCol('all');
                   }

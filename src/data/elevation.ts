@@ -3,6 +3,7 @@
  * scripts/build-elevation.mjs and public/data/etopo1-025.json).
  */
 import type { DataSource } from '../engine/types';
+import { IS_ARTIFACT } from '../lib/target';
 
 export interface ElevationMeta {
   file: string;
@@ -63,6 +64,13 @@ function dataUrl(file: string): string {
   return new URL(`data/${file}`, getDataBase()).toString();
 }
 
+function base64ToBuffer(b64: string): ArrayBuffer {
+  const bin = atob(b64.trim());
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out.buffer;
+}
+
 async function gunzipIfNeeded(buf: ArrayBuffer): Promise<ArrayBuffer> {
   const head = new Uint8Array(buf, 0, 2);
   if (head[0] !== 0x1f || head[1] !== 0x8b) return buf; // already decoded by the server
@@ -82,9 +90,12 @@ export function loadElevation(): Promise<ElevationGrid> {
       const metaRes = await fetch(dataUrl('etopo1-025.json'));
       if (!metaRes.ok) throw new Error(`Could not load elevation metadata (${metaRes.status}).`);
       const meta = (await metaRes.json()) as ElevationMeta;
-      const res = await fetch(dataUrl(meta.file));
+      // The claude.ai preview host serves only text and media types, so that
+      // build ships the same gzip bytes base64-encoded in a .txt file.
+      const res = await fetch(dataUrl(IS_ARTIFACT ? `${meta.file}.b64.txt` : meta.file));
       if (!res.ok) throw new Error(`Could not load elevation data (${res.status}).`);
-      const raw = await gunzipIfNeeded(await res.arrayBuffer());
+      const bytes = IS_ARTIFACT ? base64ToBuffer(await res.text()) : await res.arrayBuffer();
+      const raw = await gunzipIfNeeded(bytes);
       const data = new Int16Array(raw);
       if (data.length !== meta.ncols * meta.nrows) throw new Error('Elevation data has an unexpected size.');
       return { meta, ncols: meta.ncols, nrows: meta.nrows, data };

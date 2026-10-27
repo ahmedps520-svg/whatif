@@ -1,5 +1,10 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { HashRouter, NavLink, Route, Routes, useLocation, useNavigate, Link } from 'react-router-dom';
+import { HashRouter, MemoryRouter, NavLink, Route, Routes, useLocation, useNavigate, Link } from 'react-router-dom';
+import { ConfirmLayer } from './components/Confirm';
+import { IS_ARTIFACT } from './lib/target';
+
+// The preview build keeps navigation in memory: its host does not pass hash paths through.
+const Router = IS_ARTIFACT ? MemoryRouter : HashRouter;
 import { Icon } from './components/Icon';
 import { ToastLayer, toast } from './components/Toasts';
 import { Logo } from './components/Logo';
@@ -97,7 +102,7 @@ function StorageWarnings() {
 
 export function App() {
   return (
-    <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ScrollToTop />
       <StorageWarnings />
       <div className="app">
@@ -147,7 +152,8 @@ export function App() {
         </footer>
         <BottomNav />
         <ToastLayer />
+        <ConfirmLayer />
       </div>
-    </HashRouter>
+    </Router>
   );
 }

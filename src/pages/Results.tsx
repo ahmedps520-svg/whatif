@@ -18,6 +18,8 @@ import { AssistantPanel } from '../ai/AssistantPanel';
 import { noteCounter } from '../store/activity';
 import { evaluateUnlocks } from '../store/achievements';
 import { seriesColor } from '../lib/palette';
+import { IS_ARTIFACT } from '../lib/target';
+import { FullSiteNote } from '../components/FullSiteNote';
 
 export function interpAt(ts: number[], ys: number[], t: number): number {
   if (!ts.length) return NaN;
@@ -179,24 +181,28 @@ export default function Results() {
               <Icon name="check" /> Saved — view history
             </Link>
           )}
-          <button className="btn secondary" onClick={() => download(`${slug(data.question)}.json`, JSON.stringify({ question: data.question, model: model.id, run: record, baseline }, null, 1))}>
-            <Icon name="download" /> JSON
-          </button>
-          <button className="btn secondary" onClick={() => download(`${slug(data.question)}-samples.csv`, runToCsv(model, record), 'text/csv')}>
-            <Icon name="download" /> CSV
-          </button>
-          <button className="btn secondary" onClick={() => download(`${slug(data.question)}-events.csv`, eventsToCsv(model, record), 'text/csv')}>
-            <Icon name="download" /> Events CSV
-          </button>
-          <button
-            className="btn secondary"
-            onClick={() => download(`${slug(data.question)}-report.md`, runToMarkdown({ model, question: data.question, run: record, baseline, baselineLabel: data.baselineLabel, experimentAssumptions: data.assumptions, notes: data.notes, includeEducation: prefs.educationMode, level: prefs.level }), 'text/markdown')}
-          >
-            <Icon name="download" /> Report (.md)
-          </button>
-          <button className="btn secondary" onClick={() => window.print()}>
-            <Icon name="print" /> Print / PDF
-          </button>
+          {!IS_ARTIFACT && (
+            <>
+              <button className="btn secondary" onClick={() => download(`${slug(data.question)}.json`, JSON.stringify({ question: data.question, model: model.id, run: record, baseline }, null, 1))}>
+                <Icon name="download" /> JSON
+              </button>
+              <button className="btn secondary" onClick={() => download(`${slug(data.question)}-samples.csv`, runToCsv(model, record), 'text/csv')}>
+                <Icon name="download" /> CSV
+              </button>
+              <button className="btn secondary" onClick={() => download(`${slug(data.question)}-events.csv`, eventsToCsv(model, record), 'text/csv')}>
+                <Icon name="download" /> Events CSV
+              </button>
+              <button
+                className="btn secondary"
+                onClick={() => download(`${slug(data.question)}-report.md`, runToMarkdown({ model, question: data.question, run: record, baseline, baselineLabel: data.baselineLabel, experimentAssumptions: data.assumptions, notes: data.notes, includeEducation: prefs.educationMode, level: prefs.level }), 'text/markdown')}
+              >
+                <Icon name="download" /> Report (.md)
+              </button>
+              <button className="btn secondary" onClick={() => window.print()}>
+                <Icon name="print" /> Print / PDF
+              </button>
+            </>
+          )}
           <button
             className="btn secondary"
             onClick={() => {
@@ -210,6 +216,7 @@ export default function Results() {
             <Icon name="assistant" /> Ask about these results
           </button>
         </div>
+        {IS_ARTIFACT && <FullSiteNote text="Exports and printing are available" />}
       </header>
 
       <section>

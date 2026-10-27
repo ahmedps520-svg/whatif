@@ -5,6 +5,9 @@ import { resetActivity } from '../store/activity';
 import { deleteExperiment, getExperiments } from '../store/history';
 import { toast } from '../components/Toasts';
 import { play } from '../audio/sound';
+import { confirmAction } from '../components/Confirm';
+import { IS_ARTIFACT } from '../lib/target';
+import { FullSiteNote } from '../components/FullSiteNote';
 
 const MODELS = [
   { id: 'claude-opus-5-5', label: 'Claude Opus 5.5 (default)' },
@@ -67,6 +70,7 @@ export default function Settings() {
 
       <section className="panel">
         <h2 className="subhead">AI assistant (optional)</h2>
+        {IS_ARTIFACT && <FullSiteNote text="The AI assistant is available" />}
         <p className="small">
           The assistant calls the Anthropic API directly from your browser with your own key. It receives the current experiment’s documentation, parameters and recorded results when you ask a question. The rest of WHAT IF LAB works without it.
         </p>
@@ -134,8 +138,8 @@ export default function Settings() {
         <div className="toolbar">
           <button
             className="btn secondary"
-            onClick={() => {
-              if (window.confirm('Reset achievements, discoveries, recent items and run counts?')) {
+            onClick={async () => {
+              if (await confirmAction({ title: 'Reset activity', message: 'Reset achievements, discoveries, recent items and run counts?', confirmLabel: 'Reset', danger: true })) {
                 resetActivity();
                 toast('Activity reset.', 'info');
               }
@@ -145,8 +149,8 @@ export default function Settings() {
           </button>
           <button
             className="btn secondary danger"
-            onClick={() => {
-              if (window.confirm('Delete all saved experiments on this device? Export them from History first if you want to keep them.')) {
+            onClick={async () => {
+              if (await confirmAction({ title: 'Delete all saved experiments', message: 'Delete every saved experiment on this device? Export them from History first if you want to keep them.', confirmLabel: 'Delete all', danger: true })) {
                 for (const e of getExperiments()) deleteExperiment(e.id);
                 toast('All saved experiments deleted.', 'info');
               }

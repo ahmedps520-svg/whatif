@@ -1,4 +1,5 @@
 import type { ParamValues } from '../engine/types';
+import { FULL_SITE_URL, IS_ARTIFACT } from '../lib/target';
 
 /** Shareable experiment configuration, encoded in the URL (no server needed). */
 export interface SharedConfig {
@@ -42,7 +43,8 @@ export function decodeConfig(s: string): SharedConfig | null {
 }
 
 export function shareUrl(c: SharedConfig): string {
-  const base = window.location.href.split('#')[0];
+  // The preview page cannot be deep-linked, so its links open the full site.
+  const base = IS_ARTIFACT ? FULL_SITE_URL : window.location.href.split('#')[0];
   return `${base}#/shared/${encodeConfig(c)}`;
 }
 

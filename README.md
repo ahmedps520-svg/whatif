@@ -13,7 +13,10 @@ npm install
 npm run dev        # http://localhost:5173
 npm test           # model, engine, catalog and challenge tests (vitest)
 npm run build      # typecheck + production build into dist/
+npm run build:artifact  # preview build for claude.ai artifacts (dist-artifact/)
 ```
+
+The preview build uses in-memory routing and ships the elevation grid as base64 text. It hides downloads, printing and the AI chat, because that host blocks them; each spot links to the full site instead.
 
 The build is a static site (hash routing, relative paths), so it can be hosted from any path. It needs no server and no API keys.
 

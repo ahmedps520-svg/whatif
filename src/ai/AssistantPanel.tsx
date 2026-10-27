@@ -9,6 +9,8 @@ import { noteCounter } from '../store/activity';
 import { formatNumber, formatQuantity } from '../engine/units';
 import { getExperiment } from '../experiments/catalog';
 import { KindBadge } from '../components/Provenance';
+import { IS_ARTIFACT } from '../lib/target';
+import { FullSiteNote } from '../components/FullSiteNote';
 
 export type { AssistantContext };
 
@@ -257,8 +259,14 @@ export function AssistantPanel({ getContext, onClose }: { getContext: () => Assi
       </div>
       <div className="assistant-body" ref={scrollRef}>
         {mode === 'guide' && <BuiltInGuide ctx={ctx} />}
-        {mode === 'chat' && !hasKey && <KeySetup onDone={() => setHasKey(true)} />}
-        {mode === 'chat' && hasKey && (
+        {mode === 'chat' && IS_ARTIFACT && (
+          <div className="key-setup">
+            <p>The AI assistant talks to the Anthropic API directly from your browser. This preview page is not allowed to make that connection.</p>
+            <FullSiteNote text="It works" />
+          </div>
+        )}
+        {mode === 'chat' && !IS_ARTIFACT && !hasKey && <KeySetup onDone={() => setHasKey(true)} />}
+        {mode === 'chat' && !IS_ARTIFACT && hasKey && (
           <>
             {turns.length === 0 && (
               <div className="suggestions">
@@ -278,7 +286,7 @@ export function AssistantPanel({ getContext, onClose }: { getContext: () => Assi
           </>
         )}
       </div>
-      {mode === 'chat' && hasKey && (
+      {mode === 'chat' && !IS_ARTIFACT && hasKey && (
         <form
           className="assistant-input"
           onSubmit={(e) => {

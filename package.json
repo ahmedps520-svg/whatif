@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "data:etopo": "node scripts/build-elevation.mjs"
+    "data:etopo": "node scripts/build-elevation.mjs",
+    "build:artifact": "tsc --noEmit -p . && vite build --mode artifact --outDir dist-artifact && node scripts/make-artifact-page.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",

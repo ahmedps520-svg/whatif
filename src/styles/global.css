@@ -2615,3 +2615,12 @@ input[type='range'] {
     color: #0645ad;
   }
 }
+
+.share-link {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+.full-site-note {
+  margin-top: 6px;
+}
